@@ -18,8 +18,10 @@ import {
   Wifi,
   Zap,
 } from 'lucide-react'
-import type { Decision, Profile, Property } from './types'
+import type { Decision, Intent, Profile, Property } from './types'
 import { CRORE, LAKH } from './finance'
+
+export const INTENT_OPTIONS: Intent[] = ['Buy', 'Rent', 'Lease']
 
 export const AGE_OPTIONS = ['22-24', '25-27', '28-30', '31-35', '35+']
 export const GENDER_OPTIONS = [
@@ -51,11 +53,20 @@ export const DEFAULT_PROFILE: Profile = {
   name: 'Aarav',
   age: '25-27',
   gender: 'Queer / Non-Binary',
+  intent: 'Buy',
   requirement: '2 BHK Builder Floor',
   location: 'South Delhi - Saket & Malviya Nagar',
   budget: 1.15 * CRORE,
   includeStamp: true,
 }
+
+export const RENT_BUDGET_MIN = 15_000
+export const RENT_BUDGET_MAX = 150_000
+export const RENT_BUDGET_PRESETS = [35_000, 45_000, 55_000, 65_000]
+
+export const LEASE_BUDGET_MIN = 20_000
+export const LEASE_BUDGET_MAX = 200_000
+export const LEASE_BUDGET_PRESETS = [40_000, 50_000, 65_000, 85_000]
 
 export function wantsInclusiveCues(gender: string) {
   return gender === 'Queer / Non-Binary' || gender === 'Trans / Gender-Diverse'

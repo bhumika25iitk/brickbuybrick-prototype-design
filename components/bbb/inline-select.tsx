@@ -9,18 +9,16 @@ export type SlotVariant = 'sentence' | 'compact'
 
 export function slotTriggerClass(variant: SlotVariant, open: boolean) {
   return cn(
-    'group inline-flex items-center gap-1 rounded-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
-    variant === 'sentence'
-      ? 'border-b-2 border-foreground/70 px-1 pb-0.5 font-semibold text-foreground hover:border-primary'
-      : 'rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium hover:border-primary/60',
-    open && (variant === 'sentence' ? 'border-primary' : 'border-primary'),
+    'group inline-flex w-auto items-center gap-1.5 rounded-full border border-border bg-card font-medium text-foreground outline-none transition-all hover:border-primary/50 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-ring',
+    variant === 'sentence' ? 'px-4 py-2 text-base' : 'px-3.5 py-1.5 text-sm',
+    open && 'border-primary shadow-sm',
   )
 }
 
 export function SlotHint({ hint, variant }: { hint: string; variant: SlotVariant }) {
   if (variant === 'compact') return null
   return (
-    <span className="pointer-events-none absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+    <span className="pointer-events-none absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
       ({hint})
     </span>
   )
@@ -82,10 +80,10 @@ export function InlineSelect({
         }}
         className={slotTriggerClass(variant, open)}
       >
-        <span>{display(value)}</span>
+        <span className="whitespace-nowrap">{display(value)}</span>
         <ChevronDown
           aria-hidden
-          className={cn('size-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')}
+          className={cn('size-3.5 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')}
         />
       </button>
       <SlotHint hint={hint} variant={variant} />

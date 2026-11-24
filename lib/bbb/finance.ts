@@ -26,6 +26,15 @@ export function formatRupees(value: number) {
   return `Rs ${Math.round(value).toLocaleString('en-IN')}`
 }
 
+export function formatRent(value: number) {
+  const v = Math.abs(value)
+  if (v >= LAKH) {
+    const l = (v / LAKH).toFixed(1).replace(/\.0$/, '')
+    return `Rs ${l} L/mo`
+  }
+  return `Rs ${Math.round(v / 1000)}k/mo`
+}
+
 export function costBreakdown(p: Property) {
   const base = p.basePrice
   const stampDuty = base * STAMP_DUTY_PCT

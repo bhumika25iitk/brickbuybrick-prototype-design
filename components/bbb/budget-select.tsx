@@ -4,21 +4,45 @@ import { useCallback, useId, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useDismiss } from '@/hooks/use-dismiss'
-import { BUDGET_MAX, BUDGET_MIN, BUDGET_PRESETS } from '@/lib/bbb/data'
-import { formatINR, LAKH } from '@/lib/bbb/finance'
+import {
+  BUDGET_MAX,
+  BUDGET_MIN,
+  BUDGET_PRESETS,
+  LEASE_BUDGET_MAX,
+  LEASE_BUDGET_MIN,
+  LEASE_BUDGET_PRESETS,
+  RENT_BUDGET_MAX,
+  RENT_BUDGET_MIN,
+  RENT_BUDGET_PRESETS,
+} from '@/lib/bbb/data'
+import { formatINR, formatRent, LAKH } from '@/lib/bbb/finance'
+import type { Intent } from '@/lib/bbb/types'
 import { SlotHint, slotTriggerClass, type SlotVariant } from './inline-select'
 
 interface BudgetSelectProps {
   budget: number
   includeStamp: boolean
+  intent: Intent
   onBudgetChange: (v: number) => void
   onIncludeStampChange: (v: boolean) => void
   variant?: SlotVariant
 }
 
+function budgetConfig(intent: Intent) {
+  if (intent === 'Rent') return { min: RENT_BUDGET_MIN, max: RENT_BUDGET_MAX, presets: RENT_BUDGET_PRESETS, step: 5_000 }
+  if (intent === 'Lease') return { min: LEASE_BUDGET_MIN, max: LEASE_BUDGET_MAX, presets: LEASE_BUDGET_PRESETS, step: 5_000 }
+  return { min: BUDGET_MIN, max: BUDGET_MAX, presets: BUDGET_PRESETS, step: LAKH }
+}
+
+function displayBudget(value: number, intent: Intent) {
+  if (intent === 'Rent' || intent === 'Lease') return formatRent(value)
+  return formatINR(value)
+}
+
 export function BudgetSelect({
   budget,
   includeStamp,
+  intent,
   onBudgetChange,
   onIncludeStampChange,
   variant = 'sentence',
@@ -29,6 +53,8 @@ export function BudgetSelect({
   const id = useId()
   const sliderId = useId()
   const toggleId = useId()
+  const isBuy = intent === 'Buy'
+  const config = budgetConfig(intent)
 
   return (
     <span ref={ref} className="relative inline-block align-baseline">
@@ -37,14 +63,14 @@ export function BudgetSelect({
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={id}
-        aria-label={`Budget: ${formatINR(budget)}`}
+        aria-label={`Budget: ${displayBudget(budget, intent)}`}
         onClick={() => setOpen((o) => !o)}
         className={slotTriggerClass(variant, open)}
       >
-        <span>{formatINR(budget)}</span>
+        <span className="whitespace-nowrap">{displayBudget(budget, intent)}</span>
         <ChevronDown
           aria-hidden
-          className={cn('size-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')}
+          className={cn('size-3.5 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')}
         />
       </button>
       <SlotHint hint="budget" variant={variant} />
@@ -57,27 +83,27 @@ export function BudgetSelect({
         >
           <div className="flex items-baseline justify-between">
             <label htmlFor={sliderId} className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Maximum budget
+              {isBuy ? 'Maximum budget' : `Max ${intent.toLowerCase()} budget`}
             </label>
-            <span className="text-lg font-semibold tabular-nums text-foreground">{formatINR(budget)}</span>
+            <span className="text-lg font-semibold tabular-nums text-foreground">{displayBudget(budget, intent)}</span>
           </div>
           <input
             id={sliderId}
             type="range"
-            min={BUDGET_MIN}
-            max={BUDGET_MAX}
-            step={LAKH}
-            value={budget}
+            min={config.min}
+            max={config.max}
+            step={config.step}
+            value={Math.min(config.max, Math.max(config.min, budget))}
             onChange={(e) => onBudgetChange(Number(e.target.value))}
-            aria-valuetext={formatINR(budget, { long: true })}
+            aria-valuetext={displayBudget(budget, intent)}
             className="bbb-range mt-3 w-full cursor-pointer"
           />
           <div className="mt-1 flex justify-between text-xs text-muted-foreground">
-            <span>{formatINR(BUDGET_MIN)}</span>
-            <span>{formatINR(BUDGET_MAX)}</span>
+            <span>{displayBudget(config.min, intent)}</span>
+            <span>{displayBudget(config.max, intent)}</span>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            {BUDGET_PRESETS.map((p) => (
+            {config.presets.map((p) => (
               <button
                 key={p}
                 type="button"
@@ -90,34 +116,36 @@ export function BudgetSelect({
                     : 'border-border bg-card text-foreground hover:border-primary/60',
                 )}
               >
-                {formatINR(p)}
+                {displayBudget(p, intent)}
               </button>
             ))}
           </div>
-          <div className="mt-4 flex items-start justify-between gap-3 border-t border-border pt-4">
-            <label htmlFor={toggleId} className="text-sm leading-snug text-foreground">
-              Include stamp duty & registration in all-in cap
-              <span className="mt-0.5 block text-xs text-muted-foreground">Adds 7% in Delhi. Most first-time buyers forget this.</span>
-            </label>
-            <button
-              id={toggleId}
-              type="button"
-              role="switch"
-              aria-checked={includeStamp}
-              onClick={() => onIncludeStampChange(!includeStamp)}
-              className={cn(
-                'relative mt-0.5 inline-flex h-6 w-10 shrink-0 items-center rounded-full transition-colors',
-                includeStamp ? 'bg-primary' : 'bg-border',
-              )}
-            >
-              <span
+          {isBuy && (
+            <div className="mt-4 flex items-start justify-between gap-3 border-t border-border pt-4">
+              <label htmlFor={toggleId} className="text-sm leading-snug text-foreground">
+                Include stamp duty & registration in all-in cap
+                <span className="mt-0.5 block text-xs text-muted-foreground">Adds 7% in Delhi. Most first-time buyers forget this.</span>
+              </label>
+              <button
+                id={toggleId}
+                type="button"
+                role="switch"
+                aria-checked={includeStamp}
+                onClick={() => onIncludeStampChange(!includeStamp)}
                 className={cn(
-                  'inline-block size-5 rounded-full bg-card shadow transition-transform',
-                  includeStamp ? 'translate-x-[18px]' : 'translate-x-0.5',
+                  'relative mt-0.5 inline-flex h-6 w-10 shrink-0 items-center rounded-full transition-colors',
+                  includeStamp ? 'bg-primary' : 'bg-border',
                 )}
-              />
-            </button>
-          </div>
+              >
+                <span
+                  className={cn(
+                    'inline-block size-5 rounded-full bg-card shadow transition-transform',
+                    includeStamp ? 'translate-x-[18px]' : 'translate-x-0.5',
+                  )}
+                />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </span>

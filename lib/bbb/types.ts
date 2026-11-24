@@ -2,10 +2,13 @@ import type { LucideIcon } from 'lucide-react'
 
 export type Decision = 'shortlist' | 'investigate' | 'stretch' | 'walk'
 
+export type Intent = 'Buy' | 'Rent' | 'Lease'
+
 export interface Profile {
   name: string
   age: string
   gender: string
+  intent: Intent
   requirement: string
   location: string
   budget: number
