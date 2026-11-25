@@ -72,7 +72,12 @@ export function compare(query: string, profile: Profile): Comparison {
         a: cheaper.id === a.id ? `Saves ${formatRupees(diff)}/mo` : `+${formatRupees(diff)}/mo`,
         b: cheaper.id === b.id ? `Saves ${formatRupees(diff)}/mo` : `+${formatRupees(diff)}/mo`,
       },
-      { label: 'Commute to Saket', a: `${a.metro.commuteMin} min`, b: `${b.metro.commuteMin} min`, winner: a.metro.commuteMin <= b.metro.commuteMin ? 'a' : 'b' },
+      {
+        label: 'Nearest metro',
+        a: `${a.metro.walkMin} min walk (${a.metro.station})`,
+        b: `${b.metro.walkMin} min walk (${b.metro.station})`,
+        winner: a.metro.walkMin <= b.metro.walkMin ? 'a' : 'b',
+      },
       { label: 'Cat fit', a: a.catFit, b: b.catFit },
       { label: 'Park access', a: a.parkFit, b: b.parkFit },
       { label: inclusive ? 'Inclusive cues' : 'Evening safety', a: inclusive ? a.inclusiveCue : a.safetyCue, b: inclusive ? b.inclusiveCue : b.safetyCue },

@@ -30,11 +30,10 @@ export function SpecLedger({ property: p }: { property: Property }) {
       ],
     },
     {
-      title: 'Commute',
+      title: 'Transit',
       rows: [
         ['Nearest metro', `${p.metro.station} (${p.metro.line})`],
-        ['Walk to metro', `${p.metro.walkMin} min`],
-        ['Door to Saket office', `${p.metro.commuteMin} min`],
+        ['Walk to metro', `${p.metro.walkMin} min walk`],
       ],
     },
   ]

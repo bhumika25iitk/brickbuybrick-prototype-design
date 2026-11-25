@@ -91,3 +91,23 @@
 input[type='range'].bbb-range {
   accent-color: var(--primary);
 }
+
+@keyframes architecturalDrift {
+  0% {
+    transform: scale(1) translate3d(-1.5%, -1%, 0);
+  }
+  100% {
+    transform: scale(1.16) translate3d(1.5%, 1%, 0);
+  }
+}
+
+.bbb-bg-zoom {
+  animation: architecturalDrift 16s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bbb-bg-zoom {
+    animation: none;
+  }
+}

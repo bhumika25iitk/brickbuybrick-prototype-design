@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowLeft, ClipboardCheck, ExternalLink, Info, MapPin } from 'lucide-react'
+import { ArrowLeft, ClipboardCheck, Coffee, ExternalLink, Info, MapPin, TrainFront, Trees } from 'lucide-react'
 import { DECISION_META } from '@/lib/bbb/data'
+import { getNearbyAttractions } from '@/lib/bbb/locality-helpers'
 import type { Profile, Property } from '@/lib/bbb/types'
 import { DecisionBadge, FlaggedBadge } from '../badges'
 import { PhotoTour } from './photo-tour'
@@ -84,6 +85,37 @@ export function Dossier({ property: p, profile, flagReasons, onReport, onBack }:
       <div className="mt-10">
         <PhotoTour photos={p.photos} title={p.title} />
       </div>
+
+      <section aria-labelledby="nearby-heading" className="mt-10">
+        <h2 id="nearby-heading" className="text-lg font-semibold tracking-tight text-foreground">
+          Nearby attractions within a 10-minute walk
+        </h2>
+        <div className="mt-3 grid gap-4 sm:grid-cols-3">
+          {getNearbyAttractions(p).map((item) => {
+            const Icon =
+              item.category === 'Cafes & Hangouts'
+                ? Coffee
+                : item.category === 'Evening Park & Pet Loop'
+                  ? Trees
+                  : TrainFront
+            return (
+              <div key={item.category} className="rounded-xl border border-border bg-card p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary-strong">
+                    <Icon aria-hidden className="size-3.5" />
+                    {item.category}
+                  </span>
+                  <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground">
+                    {item.walkMin} min walk
+                  </span>
+                </div>
+                <p className="mt-2 text-sm font-semibold text-foreground">{item.name}</p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.detail}</p>
+              </div>
+            )
+          })}
+        </div>
+      </section>
 
       <div className="mt-14 grid gap-12 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex flex-col gap-14">

@@ -4,14 +4,22 @@ export type Decision = 'shortlist' | 'investigate' | 'stretch' | 'walk'
 
 export type Intent = 'Buy' | 'Rent' | 'Lease'
 
+export type DelhiZone =
+  | 'South Delhi'
+  | 'West Delhi'
+  | 'Central Delhi'
+  | 'North Delhi'
+  | 'East Delhi'
+
 export interface Profile {
   name: string
   age: string
   gender: string
-  intent: Intent
+  intent: Intent | ''
   requirement: string
+  city: string
   location: string
-  budget: number
+  budget: number | null
   includeStamp: boolean
 }
 
@@ -45,12 +53,42 @@ export interface Representative {
   note: string
 }
 
+export interface NearbyAttraction {
+  category: 'Cafes & Hangouts' | 'Evening Park & Pet Loop' | 'Metro & Market Stretch'
+  name: string
+  walkMin: number
+  detail: string
+}
+
+export interface LastMileSafety {
+  attractionPill: string
+  safetyPill: string
+  safetyTone: 'good' | 'warn' | 'bad'
+  metroWalk: string
+  metroWalkTone?: 'good' | 'warn' | 'bad'
+  buildingAccess: string
+  buildingAccessTone?: 'good' | 'warn' | 'bad'
+  inclusivityNote: string
+  safetyUnknown?: string
+  safetyChecklistPrompt?: string
+}
+
+export interface RentalTerms {
+  depositMonths: number
+  term: string
+  landlordNote: string
+}
+
 export interface Property {
   id: string
   decision: Decision
   title: string
   layout: string
   matches: string[]
+  city?: string
+  intents?: Intent[]
+  rentalTerms?: RentalTerms
+  zone: DelhiZone
   locality: string
   address: string
   metro: { line: string; station: string; walkMin: number; commuteMin: number }
@@ -84,4 +122,6 @@ export interface Property {
   unknowns: string[]
   gapAlert?: string
   checklist: string[]
+  nearbyAttractions?: NearbyAttraction[]
+  lastMileSafety?: LastMileSafety
 }

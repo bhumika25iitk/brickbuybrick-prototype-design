@@ -1,8 +1,9 @@
 import Image from 'next/image'
-import { BedDouble, Heart, Ruler, Sparkles, TrainFront } from 'lucide-react'
+import { BedDouble, Heart, MapPin, Ruler, ShieldCheck, Sparkles, TrainFront } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { wantsInclusiveCues } from '@/lib/bbb/data'
 import { capCost, formatINR, formatRent } from '@/lib/bbb/finance'
+import { getLastMileSafety } from '@/lib/bbb/locality-helpers'
 import type { Profile, Property } from '@/lib/bbb/types'
 import { DecisionBadge, FlaggedBadge } from './badges'
 
@@ -32,11 +33,18 @@ function formatOverCap(amount: number, profile: Profile) {
   return formatINR(amount)
 }
 
+const SAFETY_PILL_TONE = {
+  good: 'bg-success-soft text-success',
+  warn: 'bg-warning-soft text-warning',
+  bad: 'bg-danger-soft text-danger',
+}
+
 export function PropertyCard({ property: p, profile, flaggedCount, overCapBy, onOpen }: PropertyCardProps) {
   const matches = p.matches.includes(profile.requirement)
   const inclusive = wantsInclusiveCues(profile.gender)
   const cover = p.photos[0]
   const price = priceDisplay(p, profile)
+  const safety = getLastMileSafety(p, profile)
 
   return (
     <article
@@ -90,7 +98,9 @@ export function PropertyCard({ property: p, profile, flaggedCount, overCapBy, on
         <div className="flex items-start justify-between gap-4">
           <div>
             <h3 className="text-base font-semibold leading-snug text-foreground">{p.title}</h3>
-            <p className="mt-0.5 text-sm text-muted-foreground">{p.locality}, New Delhi</p>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              {p.locality}, {p.city ?? 'New Delhi'}
+            </p>
           </div>
           <div className="shrink-0 text-right">
             <p className="text-base font-semibold tabular-nums text-foreground">{price.amount}</p>
@@ -109,7 +119,7 @@ export function PropertyCard({ property: p, profile, flaggedCount, overCapBy, on
           </li>
           <li className="flex items-center gap-1.5">
             <TrainFront aria-hidden className="size-3.5" />
-            {p.metro.commuteMin} min to Saket
+            {p.metro.walkMin} min walk to {p.metro.station} metro
           </li>
         </ul>
 
@@ -134,10 +144,33 @@ export function PropertyCard({ property: p, profile, flaggedCount, overCapBy, on
           )}
         >
           <Sparkles aria-hidden className="mt-0.5 size-3.5 shrink-0" />
-          <span>{inclusive ? p.inclusiveCue : p.safetyCue}</span>
+          <span>
+            {(profile.intent === 'Rent' || profile.intent === 'Lease') && p.rentalTerms
+              ? `${p.rentalTerms.depositMonths}-month deposit, ${p.rentalTerms.term}. ${p.rentalTerms.landlordNote}`
+              : inclusive
+                ? p.inclusiveCue
+                : p.safetyCue}
+          </span>
         </div>
 
-        <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+        {/* Nearby attractions & walk safety micro-pills */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-2.5 py-1 text-xs font-medium text-foreground">
+            <MapPin aria-hidden className="size-3 text-muted-foreground" />
+            {safety.attractionPill}
+          </span>
+          <span
+            className={cn(
+              'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold',
+              SAFETY_PILL_TONE[safety.safetyTone],
+            )}
+          >
+            <ShieldCheck aria-hidden className="size-3" />
+            {safety.safetyPill}
+          </span>
+        </div>
+
+        <div className="mt-auto flex items-center justify-between gap-3 pt-4">
           <span className={cn('text-xs font-medium', matches ? 'text-success' : 'text-muted-foreground')}>
             {matches ? `Matches your ${profile.requirement} ask` : `Different layout: ${p.layout}`}
           </span>

@@ -1,5 +1,6 @@
 import { BadgeCheck, Calculator, CircleHelp, Lightbulb } from 'lucide-react'
 import { costBreakdown, downPaymentFor, emiFor, formatINR, formatRupees, tenureForAge } from '@/lib/bbb/finance'
+import { getLastMileSafety } from '@/lib/bbb/locality-helpers'
 import type { Profile, Property } from '@/lib/bbb/types'
 import { FlaggedBadge, toneText } from '../badges'
 
@@ -14,6 +15,26 @@ export function EvidenceLedger({ property: p, profile, flagReasons }: EvidenceLe
   const emi = emiFor(p, profile.age)
   const years = tenureForAge(profile.age)
   const rentGap = emi + p.maintenance - p.localRent
+  const safety = getLastMileSafety(p, profile)
+  const isCalibratedInclusivity =
+    profile.gender === 'Queer / Non-Binary' ||
+    profile.gender === 'Trans / Gender-Diverse' ||
+    profile.gender === 'Female'
+
+  const verifiedItems = [
+    ...p.verified,
+    { label: 'Last-mile metro walk', value: safety.metroWalk, tone: safety.metroWalkTone },
+    { label: 'Building access', value: safety.buildingAccess, tone: safety.buildingAccessTone },
+    {
+      label: isCalibratedInclusivity ? 'Neighborhood inclusivity' : 'Resident environment',
+      value: safety.inclusivityNote,
+      tone: 'good' as const,
+    },
+  ]
+
+  const unknownItems = safety.safetyUnknown && !p.unknowns.includes(safety.safetyUnknown)
+    ? [...p.unknowns, safety.safetyUnknown]
+    : p.unknowns
 
   const costRows: [string, number][] = [
     ['Base price', c.base],
@@ -50,8 +71,8 @@ export function EvidenceLedger({ property: p, profile, flagReasons }: EvidenceLe
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Tier icon={BadgeCheck} title="Verified facts" tone="text-success">
           <dl className="space-y-2.5 text-sm">
-            {p.verified.map((v) => (
-              <div key={v.label} className="grid grid-cols-[7rem_1fr] gap-3">
+            {verifiedItems.map((v) => (
+              <div key={v.label} className="grid grid-cols-[7.5rem_1fr] gap-3">
                 <dt className="text-muted-foreground">{v.label}</dt>
                 <dd className={toneText(v.tone)}>{v.value}</dd>
               </div>
@@ -102,7 +123,7 @@ export function EvidenceLedger({ property: p, profile, flagReasons }: EvidenceLe
 
         <Tier icon={CircleHelp} title="Unknowns" tone="text-danger">
           <ul className="list-disc space-y-1.5 pl-5 text-sm text-foreground">
-            {p.unknowns.map((u) => (
+            {unknownItems.map((u) => (
               <li key={u}>{u}</li>
             ))}
           </ul>

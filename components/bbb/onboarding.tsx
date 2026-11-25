@@ -13,10 +13,28 @@ interface OnboardingProps {
 }
 
 export function Onboarding({ profile, onChange, onSearch, onHome }: OnboardingProps) {
+  const isComplete = Boolean(
+    profile.name.trim() &&
+      profile.age &&
+      profile.gender &&
+      profile.intent &&
+      profile.requirement &&
+      profile.city &&
+      profile.location &&
+      profile.budget !== null,
+  )
+
   return (
     <main className="relative flex min-h-dvh flex-col overflow-hidden bg-background">
-      <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.12]">
-        <Image src="/images/skyline.png" alt="" fill sizes="100vw" className="object-cover object-bottom mix-blend-multiply" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.14]">
+        <Image
+          src="/images/skyline.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="bbb-bg-zoom will-change-transform object-cover object-bottom mix-blend-multiply"
+        />
       </div>
 
       <header className="relative z-10 flex justify-center pt-8">
@@ -26,23 +44,28 @@ export function Onboarding({ profile, onChange, onSearch, onHome }: OnboardingPr
       <form
         onSubmit={(e) => {
           e.preventDefault()
-          onSearch()
+          if (isComplete) onSearch()
         }}
         className="relative z-10 mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-6 pb-16 text-center animate-in fade-in slide-in-from-bottom-3 duration-500"
       >
-        <p className="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        <h1 className="mb-8 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
           Tell us what you need
-        </p>
+        </h1>
         <ConstraintSentence profile={profile} onChange={onChange} />
+
+        {!isComplete && (
+          <p className="mt-8 text-xs font-medium text-muted-foreground">
+            Fill in the fields above to see matching homes
+          </p>
+        )}
+
         <button
           type="submit"
-          className="mt-14 rounded-full bg-primary px-14 py-3 text-base font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          disabled={!isComplete}
+          className="mt-6 rounded-full bg-primary px-14 py-3 text-base font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
         >
           Search
         </button>
-        <p className="mt-4 max-w-sm text-xs leading-relaxed text-muted-foreground">
-          Every slot stays editable inside the Decision Room. Nothing is locked, and exact addresses are always shown.
-        </p>
       </form>
     </main>
   )
