@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { BadgeCheck, TriangleAlert } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { assetPath, cn } from '@/lib/utils'
 import type { Photo } from '@/lib/bbb/types'
 
 export function PhotoTour({ photos, title }: { photos: Photo[]; title: string }) {
@@ -31,7 +31,7 @@ export function PhotoTour({ photos, title }: { photos: Photo[]; title: string })
                 i === index ? 'ring-2 ring-foreground' : 'opacity-80 group-hover:opacity-100',
               )}
             >
-              <Image src={photo.src || '/placeholder.svg'} alt="" fill sizes="176px" className="object-cover" />
+              <Image src={assetPath(photo.src || '/placeholder.svg')} alt="" fill sizes="176px" className="object-cover" />
             </span>
             <span className={cn('mt-2 block text-sm', i === index ? 'font-semibold text-foreground' : 'text-foreground')}>
               {photo.room}
@@ -58,7 +58,7 @@ export function PhotoTour({ photos, title }: { photos: Photo[]; title: string })
         </div>
         <div key={current.room + index} className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted animate-in fade-in duration-300">
           <Image
-            src={current.src || '/placeholder.svg'}
+            src={assetPath(current.src || '/placeholder.svg')}
             alt={`${current.room}, ${title}. ${current.caption}`}
             fill
             sizes="(min-width: 1024px) 60vw, 100vw"

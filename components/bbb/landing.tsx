@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { assetPath } from '@/lib/utils'
 import { Wordmark } from './wordmark'
 
 export function Landing({ onStart }: { onStart: () => void }) {
@@ -35,7 +36,7 @@ export function Landing({ onStart }: { onStart: () => void }) {
 
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-36 sm:h-52">
         <Image
-          src="/images/skyline.png"
+          src={assetPath('/images/skyline.png')}
           alt=""
           fill
           priority

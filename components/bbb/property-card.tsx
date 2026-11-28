@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { BedDouble, Heart, MapPin, Ruler, ShieldCheck, Sparkles, TrainFront } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { assetPath, cn } from '@/lib/utils'
 import { wantsInclusiveCues } from '@/lib/bbb/data'
 import { capCost, formatINR, formatRent } from '@/lib/bbb/finance'
 import { getLastMileSafety } from '@/lib/bbb/locality-helpers'
@@ -61,7 +61,7 @@ export function PropertyCard({ property: p, profile, flaggedCount, overCapBy, on
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-muted">
         <Image
-          src={cover.src || '/placeholder.svg'}
+          src={assetPath(cover.src || '/placeholder.svg')}
           alt={`${cover.room} at ${p.title}`}
           fill
           sizes="(min-width: 1024px) 40vw, 100vw"

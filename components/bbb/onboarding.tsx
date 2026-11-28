@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { assetPath } from '@/lib/utils'
 import type { Profile } from '@/lib/bbb/types'
 import { ConstraintSentence } from './constraint-sentence'
 import { Wordmark } from './wordmark'
@@ -28,7 +29,7 @@ export function Onboarding({ profile, onChange, onSearch, onHome }: OnboardingPr
     <main className="relative flex min-h-dvh flex-col overflow-hidden bg-background">
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.14]">
         <Image
-          src="/images/skyline.png"
+          src={assetPath('/images/skyline.png')}
           alt=""
           fill
           priority
